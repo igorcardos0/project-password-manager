@@ -1,11 +1,26 @@
-import './App.css';
+import React, { useState } from 'react';
 import Form from './components/Form';
 
 function App() {
+  const [showForm, setShowForm] = useState(false);
+
+  const handleShowForm = () => {
+    setShowForm(true);
+  };
+
+  const handleHideForm = () => {
+    setShowForm(false);
+  };
+
   return (
-    <div>
+    <div className="App">
       <h1>Gerenciador de senhas</h1>
-      <Form />
+      {showForm ? (
+        <Form onCancel={ handleHideForm } />
+      ) : (
+        <button onClick={ handleShowForm }>Cadastrar nova senha</button>
+      )}
+      {/* O restante do conteúdo da sua aplicação */}
     </div>
   );
 }
