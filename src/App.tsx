@@ -12,6 +12,10 @@ function App() {
     setIsFormVisible(false);
   };
 
+  const removePasswordEntry = (login: string) => {
+    setPasswordEntries(passwordEntries.filter((entry) => entry.loginField !== login));
+  };
+
   const toggleHidePasswords = () => {
     setHidePasswords(!hidePasswords);
   };
@@ -36,13 +40,11 @@ function App() {
               <p>{entry.loginField}</p>
               <p>{renderPassword(entry.passwordField)}</p>
               <button
-                onClick={ () => setPasswordEntries(
-                  passwordEntries.filter((e) => e.loginField !== entry.loginField),
-                ) }
+                onClick={ () => removePasswordEntry(entry.loginField) }
+                data-testid="remove-btn"
               >
                 Remover
               </button>
-
               <label htmlFor="hidePasswords">Esconder senhas</label>
               <input
                 type="checkbox"

@@ -29,7 +29,12 @@ function Form({ addPasswordEntry, setFormVisible }: FormProps) {
     e.preventDefault();
     if (validateForm()) {
       addPasswordEntry(formState);
-      setFormVisible(false);
+      setFormState({
+        serviceName: '',
+        loginField: '',
+        passwordField: '',
+        linkField: '',
+      });
     }
   };
 
