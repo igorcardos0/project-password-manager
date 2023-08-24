@@ -1,110 +1,114 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 
-type FormProps = {
-  onCancel: () => void;
-};
+export interface PasswordEntry {
+  serviceName: string;
+  loginField: string;
+  passwordField: string;
+  linkField: string;
+}
 
-function Form({ onCancel }: FormProps) {
-  const [isButtonEnabled, setIsButtonEnabled] = useState<boolean | ''>(false);
-  const [passwordValidation, setPasswordValidation] = useState({
-    minLength: false,
-    maxLength: false,
-    hasLettersAndNumbers: false,
-    hasSpecialCharacter: false,
+interface FormProps {
+  addPasswordEntry: (entry: PasswordEntry) => void;
+  setFormVisible: (visible: boolean) => void;
+}
+
+function Form({ addPasswordEntry, setFormVisible }: FormProps) {
+  const [formState, setFormState] = useState<PasswordEntry>({
+    serviceName: '',
+    loginField: '',
+    passwordField: '',
+    linkField: '',
   });
 
-  const validatePassword = (password: string) => {
-    const minLength = password.length >= 8;
-    const maxLength = password.length <= 16;
-    const hasLettersAndNumbers = /\d/.test(password) && /[a-zA-Z]/.test(password);
-    const hasSpecialCharacter = /[!@#$%^&*]/.test(password);
-
-    return {
-      minLength,
-      maxLength,
-      hasLettersAndNumbers,
-      hasSpecialCharacter,
-    };
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleInputChange = () => {
-    const serviceName = document.getElementById('serviceName') as HTMLInputElement;
-    const login = document.getElementById('login') as HTMLInputElement;
-    const password = document.getElementById('password') as HTMLInputElement;
-
-    const newPasswordValidation = validatePassword(password.value);
-    setPasswordValidation(newPasswordValidation);
-
-    // console.log('Password validation:', newPasswordValidation);
-
-    const isFormValid = serviceName.value
-      && login.value
-      && newPasswordValidation.minLength
-      && newPasswordValidation.maxLength
-      && newPasswordValidation.hasLettersAndNumbers
-      && newPasswordValidation.hasSpecialCharacter;
-
-    setIsButtonEnabled(isFormValid);
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (validateForm()) {
+      addPasswordEntry(formState);
+      setFormVisible(false);
+    }
   };
 
-  const renderPasswordMessage = (isValid: boolean, message: string) => {
-    return isValid ? (
-      <p className="valid-password-check">{message}</p>
-    ) : (
-      <p className="invalid-password-check">{message}</p>
+  const validateForm = () => {
+    const serviceNameValid = formState.serviceName.length > 0;
+    const loginValid = formState.loginField.length > 0;
+    const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@#$%^&+=!_])[A-Za-z\d@#$%^&+=!_]{8,16}$/.test(
+      formState.passwordField,
     );
+    return serviceNameValid && loginValid && passwordValid;
   };
+
+  const renderPasswordAlerts = () => (
+    <ol>
+      <li>
+        {passwordAlert(
+          'Possuir 8 ou mais caracteres',
+          formState.passwordField.length >= 8,
+        )}
+
+      </li>
+      <li>
+        {passwordAlert(
+          'Possuir até 16 caracteres',
+          formState.passwordField.length <= 16,
+        )}
+      </li>
+      <li>{passwordAlert('Possuir letras e números', /^(?=.*[a-z])(?=.*\d)/.test(formState.passwordField))}</li>
+      <li>{passwordAlert('Possuir algum caractere especial', /^(?=.*[@#$%^&+=!])/.test(formState.passwordField))}</li>
+    </ol>
+  );
+
+  const passwordAlert = (message: string, condition: boolean) => (
+    <span
+      className={ condition ? 'valid-password-check' : 'invalid-password-check' }
+    >
+      {message}
+    </span>
+  );
 
   return (
     <div>
-      <label htmlFor="serviceName">Nome do serviço:</label>
-      <input
-        type="text"
-        id="serviceName"
-        name="serviceName"
-        onChange={ handleInputChange }
-      />
-      <label htmlFor="login">Login:</label>
-      <input
-        type="text"
-        id="login"
-        name="login"
-        onChange={ handleInputChange }
-      />
-      <label htmlFor="password">Senha:</label>
-      <input
-        type="password"
-        id="password"
-        name="password"
-        onChange={ handleInputChange }
-      />
-      <label htmlFor="url">URL:</label>
-      <input type="text" id="url" name="url" />
-
-      {renderPasswordMessage(
-        passwordValidation.minLength,
-        'Possuir 8 ou mais caracteres',
-      )}
-
-      {renderPasswordMessage(
-        passwordValidation.maxLength,
-        'Possuir até 16 caracteres',
-      )}
-
-      {renderPasswordMessage(
-        passwordValidation.hasLettersAndNumbers,
-        'Possuir letras e números',
-      )}
-
-      {renderPasswordMessage(
-        passwordValidation.hasSpecialCharacter,
-        'Possuir algum caractere especial',
-      )}
-
-      <button disabled={ isButtonEnabled === '' || !isButtonEnabled }>
-        Cadastrar
-      </button>
-      <button onClick={ onCancel }>Cancelar</button>
+      <form onSubmit={ handleSubmit }>
+        <label htmlFor="serviceName">Nome do Serviço</label>
+        <input
+          type="text"
+          name="serviceName"
+          id="serviceName"
+          onChange={ handleChange }
+          value={ formState.serviceName }
+        />
+        <label htmlFor="loginField">Login</label>
+        <input
+          type="text"
+          name="loginField"
+          id="loginField"
+          onChange={ handleChange }
+          value={ formState.loginField }
+        />
+        <label htmlFor="passwordField">Senha</label>
+        <input
+          type="password"
+          name="passwordField"
+          id="passwordField"
+          onChange={ handleChange }
+          value={ formState.passwordField }
+        />
+        <label htmlFor="linkField">URL</label>
+        <input
+          type="text"
+          name="linkField"
+          id="linkField"
+          onChange={ handleChange }
+          value={ formState.linkField }
+        />
+        <button disabled={ !validateForm() }>Cadastrar</button>
+        <button onClick={ () => setFormVisible(false) }>Cancelar</button>
+        <div>{renderPasswordAlerts()}</div>
+      </form>
     </div>
   );
 }

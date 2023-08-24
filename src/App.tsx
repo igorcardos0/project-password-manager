@@ -1,25 +1,60 @@
 import React, { useState } from 'react';
-import Form from './components/Form';
+import './App.css';
+import Form, { PasswordEntry } from './components/Form';
 
 function App() {
-  const [showForm, setShowForm] = useState(false);
+  const [hidePasswords, setHidePasswords] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [passwordEntries, setPasswordEntries] = useState<PasswordEntry[]>([]);
 
-  const handleShowForm = () => {
-    setShowForm(true);
+  const addPasswordEntry = (entry: PasswordEntry) => {
+    setPasswordEntries([...passwordEntries, entry]);
+    setIsFormVisible(false);
   };
 
-  const handleHideForm = () => {
-    setShowForm(false);
+  const toggleHidePasswords = () => {
+    setHidePasswords(!hidePasswords);
   };
+
+  const renderPassword = (password: string) => (hidePasswords ? '******' : password);
 
   return (
-    <div className="App">
+    <div>
       <h1>Gerenciador de senhas</h1>
-      {showForm ? (
-        <Form onCancel={ handleHideForm } />
+      {isFormVisible ? (
+        <Form addPasswordEntry={ addPasswordEntry } setFormVisible={ setIsFormVisible } />
       ) : (
-        <button onClick={ handleShowForm }>Cadastrar nova senha</button>
+        <button onClick={ () => setIsFormVisible(true) }>Cadastrar Nova Senha</button>
       )}
+      <div>
+        {passwordEntries.length === 0 ? (
+          <span>Nenhuma senha Cadastrada</span>
+        ) : (
+          passwordEntries.map((entry) => (
+            <div key={ entry.loginField }>
+              <a href={ entry.linkField }>{entry.serviceName}</a>
+              <p>{entry.loginField}</p>
+              <p>{renderPassword(entry.passwordField)}</p>
+              <button
+                onClick={ () => setPasswordEntries(
+                  passwordEntries.filter((e) => e.loginField !== entry.loginField),
+                ) }
+              >
+                Remover
+              </button>
+
+              <label htmlFor="hidePasswords">Esconder senhas</label>
+              <input
+                type="checkbox"
+                name=""
+                id="hidePasswords"
+                checked={ hidePasswords }
+                onChange={ toggleHidePasswords }
+              />
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
