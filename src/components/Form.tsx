@@ -61,5 +61,4 @@ function Form({ onCancel }: FormProps) {
     </div>
   );
 }
-
 export default Form;

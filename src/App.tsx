@@ -20,7 +20,6 @@ function App() {
       ) : (
         <button onClick={ handleShowForm }>Cadastrar nova senha</button>
       )}
-      {/* O restante do conteúdo da sua aplicação */}
     </div>
   );
 }
