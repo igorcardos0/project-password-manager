@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 type FormProps = {
   onCancel: () => void;
 };
 
 function Form({ onCancel }: FormProps) {
-  const [isButtonEnabled, setIsButtonEnabled] = useState<boolean | '' >(false);
+  const [isButtonEnabled, setIsButtonEnabled] = useState<boolean | ''>(false);
   const [passwordValidation, setPasswordValidation] = useState({
     minLength: false,
     maxLength: false,
@@ -35,6 +35,8 @@ function Form({ onCancel }: FormProps) {
     const newPasswordValidation = validatePassword(password.value);
     setPasswordValidation(newPasswordValidation);
 
+    // console.log('Password validation:', newPasswordValidation);
+
     const isFormValid = serviceName.value
       && login.value
       && newPasswordValidation.minLength
@@ -54,7 +56,7 @@ function Form({ onCancel }: FormProps) {
   };
 
   return (
-    <>
+    <div>
       <label htmlFor="serviceName">Nome do serviço:</label>
       <input
         type="text"
@@ -63,7 +65,12 @@ function Form({ onCancel }: FormProps) {
         onChange={ handleInputChange }
       />
       <label htmlFor="login">Login:</label>
-      <input type="text" id="login" name="login" onChange={ handleInputChange } />
+      <input
+        type="text"
+        id="login"
+        name="login"
+        onChange={ handleInputChange }
+      />
       <label htmlFor="password">Senha:</label>
       <input
         type="password"
@@ -94,9 +101,11 @@ function Form({ onCancel }: FormProps) {
         'Possuir algum caractere especial',
       )}
 
-      <button disabled={ isButtonEnabled === '' || !isButtonEnabled }>Cadastrar</button>
+      <button disabled={ isButtonEnabled === '' || !isButtonEnabled }>
+        Cadastrar
+      </button>
       <button onClick={ onCancel }>Cancelar</button>
-    </>
+    </div>
   );
 }
 
