@@ -12,8 +12,9 @@ function App() {
     setIsFormVisible(false);
   };
 
-  const removePasswordEntry = (login: string) => {
-    setPasswordEntries(passwordEntries.filter((entry) => entry.loginField !== login));
+  const removePasswordEntry = (index: number) => {
+    const updatedEntries = passwordEntries.filter((_, i) => i !== index);
+    setPasswordEntries(updatedEntries);
   };
 
   const toggleHidePasswords = () => {
@@ -34,13 +35,13 @@ function App() {
         {passwordEntries.length === 0 ? (
           <span>Nenhuma senha Cadastrada</span>
         ) : (
-          passwordEntries.map((entry) => (
-            <div key={ entry.loginField }>
+          passwordEntries.map((entry, index) => (
+            <div className="password-entry" key={ entry.loginField }>
               <a href={ entry.linkField }>{entry.serviceName}</a>
               <p>{entry.loginField}</p>
               <p>{renderPassword(entry.passwordField)}</p>
               <button
-                onClick={ () => removePasswordEntry(entry.loginField) }
+                onClick={ () => removePasswordEntry(index) }
                 data-testid="remove-btn"
               >
                 Remover
